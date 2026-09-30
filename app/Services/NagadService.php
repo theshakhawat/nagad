@@ -8,6 +8,7 @@ use RuntimeException;
 class NagadService
 {
     protected string $publicKey;
+
     protected string $privateKey;
 
     public function __construct()
@@ -35,9 +36,6 @@ class NagadService
         $this->publicKey = file_get_contents($publicKeyPath);
         $this->privateKey = file_get_contents($privateKeyPath);
     }
-
-
-
 
     protected function encrypt(array $data): string
     {
@@ -126,13 +124,13 @@ class NagadService
     public function initialize(string $orderId): object
     {
         $merchantId = config('nagad.merchant_id');
-        $url = rtrim(config('nagad.base_url')) . "/check-out/initialize/{$merchantId}/{$orderId}";
+        $url = rtrim(config('nagad.base_url'))."/check-out/initialize/{$merchantId}/{$orderId}";
 
         $sensitiveData = [
             'merchantId' => $merchantId,
-            'dateTime'   => now('Asia/Dhaka')->format('YmdHis'),
-            'orderId'    => $orderId,
-            'challenge'  => $this->generateChallenge(),
+            'dateTime' => now('Asia/Dhaka')->format('YmdHis'),
+            'orderId' => $orderId,
+            'challenge' => $this->generateChallenge(),
         ];
 
         $encryptedData = $this->encrypt($sensitiveData);
@@ -140,16 +138,16 @@ class NagadService
 
         $payload = [
             'accountNumber' => config('nagad.account_number'),
-            'dateTime'      => now('Asia/Dhaka')->format('YmdHis'),
+            'dateTime' => now('Asia/Dhaka')->format('YmdHis'),
             'sensitiveData' => $encryptedData,
-            'signature'     => $signature,
+            'signature' => $signature,
         ];
 
         $response = Http::withHeaders([
-            'Content-Type'     => 'application/json',
+            'Content-Type' => 'application/json',
             'X-KM-Api-Version' => config('nagad.api_version'),
             'X-KM-Client-Type' => config('nagad.client_type'),
-            'X-KM-IP-V4'       => config('nagad.server_ip'),
+            'X-KM-IP-V4' => config('nagad.server_ip'),
         ])
             ->acceptJson()
             ->asJson()
