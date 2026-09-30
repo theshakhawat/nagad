@@ -105,6 +105,9 @@
         </main>
     </div>
 
+    <!-- Custom Bottom-Right Toast Notifications Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
+
     <!-- ========================================================================= -->
     <!-- INTERACTIVE SCRIPTS -->
     <!-- ========================================================================= -->
@@ -167,7 +170,31 @@
             if (notifMenu && !e.target.closest('[onclick*="notifications-menu"]') && !notifMenu.contains(e.target)) {
                 notifMenu.classList.add('hidden');
             }
+
+            const userMenu = document.getElementById('user-menu');
+            if (userMenu && !e.target.closest('#user-menu-btn') && !userMenu.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
         });
+
+        // Mark all notifications as read
+        function markAllNotificationsRead() {
+            const notifItems = document.querySelectorAll('#notifications-menu a');
+            notifItems.forEach(item => {
+                item.classList.remove('bg-blue-50/30', 'dark:bg-blue-950/10');
+                item.classList.add('opacity-75');
+                const dot = item.querySelector('.bg-blue-600');
+                if (dot) dot.remove();
+            });
+            const badge = document.querySelector('#notifications-menu .bg-blue-50');
+            if (badge) {
+                badge.textContent = '0 New';
+            }
+            const ping = document.querySelector('#notifications-menu-btn .animate-ping');
+            if (ping && ping.parentElement) {
+                ping.parentElement.remove();
+            }
+        }
 
         // Date range select handler
         function selectDateRange(label) {
@@ -211,6 +238,112 @@
                 }
             });
         }
+
+        // Play notification chime using Web Audio API
+        function playNotificationSound(type = 'success') {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+
+                if (type === 'success' || type === 'info') {
+                    // Pleasant two-tone chime
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+                    gain1.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(ctx.currentTime);
+                    osc1.stop(ctx.currentTime + 0.15);
+
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.08); // A5
+                    gain2.gain.setValueAtTime(0.08, ctx.currentTime + 0.08);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(ctx.currentTime + 0.08);
+                    osc2.stop(ctx.currentTime + 0.35);
+                } else if (type === 'error') {
+                    // Alert tone
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.25);
+                }
+            } catch (e) {
+                // Audio context not allowed or failed silently
+            }
+        }
+
+        // Global Toast Notification Helper
+        window.showToast = function(message, type = 'success') {
+            playNotificationSound(type);
+
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'pointer-events-auto flex items-center gap-3 p-3.5 px-4 rounded-2xl bg-white dark:bg-[#121829] border border-slate-200/90 dark:border-slate-800 shadow-2xl text-xs font-semibold text-slate-800 dark:text-slate-100 transform translate-y-4 opacity-0 transition-all duration-300';
+
+            let iconHtml = '';
+            if (type === 'success') {
+                iconHtml = `
+                    <div class="w-7 h-7 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>`;
+            } else if (type === 'error') {
+                iconHtml = `
+                    <div class="w-7 h-7 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>`;
+            } else {
+                iconHtml = `
+                    <div class="w-7 h-7 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/40 flex items-center justify-center shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>`;
+            }
+
+            toast.innerHTML = `
+                ${iconHtml}
+                <div class="flex-1">
+                    <p class="leading-tight">${message}</p>
+                </div>
+                <button type="button" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1" onclick="this.parentElement.remove()">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
     </script>
     @stack('scripts')
 </body>

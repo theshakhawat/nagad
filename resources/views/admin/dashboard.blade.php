@@ -386,9 +386,9 @@
         <div class="bg-white dark:bg-[#121829] p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <h4 class="font-bold text-sm text-slate-900 dark:text-white">Website Status (6 Websites)</h4>
-                <button type="button" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm transition">
+                <a href="{{ route('admin.websites.create') }}" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-sm transition">
                     <span>+ Add Website</span>
-                </button>
+                </a>
             </div>
 
             <div class="overflow-x-auto">
@@ -462,7 +462,7 @@
             </div>
 
             <div class="mt-3 text-center pt-2 border-t border-slate-100 dark:border-slate-800/60">
-                <a href="#" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
+                <a href="{{ route('admin.websites.index') }}" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
                     View All Websites <span>→</span>
                 </a>
             </div>
@@ -522,7 +522,7 @@
                 </a>
 
                 <!-- Action 2 -->
-                <a href="#" class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex flex-col items-center justify-center gap-1.5 transition">
+                <a href="{{ route('admin.websites.create') }}" class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 flex flex-col items-center justify-center gap-1.5 transition">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>

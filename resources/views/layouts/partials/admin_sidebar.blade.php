@@ -9,18 +9,11 @@
     <!-- Top Section -->
     <div class="flex flex-col h-full overflow-hidden">
         <!-- Brand Logo Header -->
-        <div class="p-5 flex items-center justify-between border-b border-slate-800/60">
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-blue-600/30">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="font-bold text-white tracking-tight text-lg leading-none">Nagad Pay</h1>
-                    <p class="text-[11px] text-slate-400 font-medium mt-1">Central Payment Portal</p>
-                </div>
-            </div>
+        <div class="p-4 px-5 flex items-center justify-between border-b border-slate-800/60">
+            <a href="{{ route('dashboard') }}" class="flex items-center">
+                <img src="{{ asset('assets/img/Nagad-Logo.wine.svg') }}" alt="Nagad" class="h-9 w-auto">
+                <span class="ml-2 text-lg font-semibold text-white">Nagad</span>
+            </a>
 
             <!-- Close button for mobile -->
             <button id="sidebar-close-btn" class="lg:hidden text-slate-400 hover:text-white p-1" type="button">
@@ -30,9 +23,9 @@
 
         <!-- Navigation Links -->
         <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-1 text-sm font-medium">
-            <!-- Dashboard (Active) -->
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/25 font-semibold transition-all">
-                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <!-- Dashboard -->
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25 font-semibold' : 'text-slate-300 hover:text-white hover:bg-slate-800/60' }} transition-all">
+                <svg class="w-5 h-5 {{ request()->routeIs('dashboard') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
                 <span>Dashboard</span>
@@ -46,12 +39,20 @@
                 <span>Transactions</span>
             </a>
 
-            <!-- Websites / Merchants -->
+            <!-- Websites -->
+            <a href="{{ route('admin.websites.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl {{ request()->routeIs('admin.websites.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25 font-semibold' : 'text-slate-300 hover:text-white hover:bg-slate-800/60' }} transition-all">
+                <svg class="w-5 h-5 {{ request()->routeIs('admin.websites.*') ? 'text-white' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+                <span>Websites</span>
+            </a>
+
+            <!-- Merchants -->
             <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors">
                 <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
-                <span>Websites / Merchants</span>
+                <span>Merchants</span>
             </a>
 
             <!-- Nagad Integration -->
@@ -104,6 +105,26 @@
                     <a href="#" class="block py-1.5 hover:text-white transition-colors">Daily Volume</a>
                     <a href="#" class="block py-1.5 hover:text-white transition-colors">Merchant Analytics</a>
                     <a href="#" class="block py-1.5 hover:text-white transition-colors">Settlements</a>
+                </div>
+            </div>
+
+            <!-- Profile (Accordion) -->
+            <div class="space-y-1">
+                <button type="button" onclick="toggleSubmenu('profile-submenu', 'profile-chevron')"
+                    class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl {{ request()->routeIs('admin.profile*') || request()->routeIs('admin.change-password*') ? 'bg-slate-800/80 text-white font-semibold' : 'text-slate-300 hover:text-white hover:bg-slate-800/60' }} transition-colors">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 {{ request()->routeIs('admin.profile*') || request()->routeIs('admin.change-password*') ? 'text-blue-400' : 'text-slate-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span>Profile</span>
+                    </div>
+                    <svg id="profile-chevron" class="w-4 h-4 text-slate-500 transition-transform duration-200 {{ request()->routeIs('admin.profile*') || request()->routeIs('admin.change-password*') ? 'rotate-180' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div id="profile-submenu" class="{{ request()->routeIs('admin.profile*') || request()->routeIs('admin.change-password*') ? '' : 'hidden' }} pl-11 pr-3 py-1 space-y-1 text-xs text-slate-400">
+                    <a href="{{ route('admin.profile') }}" class="block py-1.5 {{ request()->routeIs('admin.profile') ? 'text-blue-400 font-semibold' : 'hover:text-white' }} transition-colors">Profile</a>
+                    <a href="{{ route('admin.change-password') }}" class="block py-1.5 {{ request()->routeIs('admin.change-password') ? 'text-blue-400 font-semibold' : 'hover:text-white' }} transition-colors">Change Password</a>
                 </div>
             </div>
 
@@ -165,6 +186,5 @@
                 <span>Documentation</span>
             </a>
         </nav>
-
     </div>
 </aside>
